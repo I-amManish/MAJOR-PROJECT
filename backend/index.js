@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 
-const config = require("./config.json")
+const config = require("./config.json");
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt");
 const express = require("express");
@@ -20,7 +20,7 @@ app.use(cors({ origin: "*" }));
 
 
 // info: Create Account
-app.get("/create-account", async (req, res) =>{
+app.post("/create-account", async (req, res) =>{
     const { fullName, email, password} = req.body;
 
     if(!fullName || !email || !password){
@@ -39,7 +39,7 @@ app.get("/create-account", async (req, res) =>{
     const user = new User ({
         fullName,
         email,
-        passowrd: hashedPassword,
+        password: hashedPassword,
     });
 
     await user.save();
