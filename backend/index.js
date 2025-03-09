@@ -6,9 +6,12 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const User = require('./models/user.model');
 
 const { authenticateToken } = require('./utilities')
+
+const User = require('./models/user.model');
+const TravelStory = require('./models/travelStory.model')
+
 
 mongoose.connect(config.connectionString);
 
@@ -103,6 +106,16 @@ app.post("/get-user",authenticateToken, async (req, res ) => {
     });
 
 });
+
+// info: add story
+app.post("/add-story",authenticateToken, async (req, res ) => {
+    const { title, story, visitedLocation, imageUrl, visitedDate } = req.body;
+    const { userId } = req.user
+
+    // info: Validate required fileds
+    if(!title || !story || !visitedLocation || !imageUrl || !)
+
+})
 
 app.listen(3000);
 module.exports = app;
