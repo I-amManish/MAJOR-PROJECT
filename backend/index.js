@@ -6,11 +6,15 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const upload = require('./multer');
+const fs = require('fs');
+const path = require('path')
 
 const { authenticateToken } = require('./utilities')
 
 const User = require('./models/user.model');
-const TravelStory = require('./models/travelStory.model')
+const TravelStory = require('./models/travelStory.model');
+const { resolveSoa } = require('dns');
 
 
 mongoose.connect(config.connectionString);
@@ -151,9 +155,7 @@ app.get("/get-all-stories", authenticateToken, async (req, res) => {
 
 
 // info: Route to handle image upload
-app.get("/image-upload", authenticateToken, async (req, res) => {
-    
-});
+
 
 app.listen(3000);
 module.exports = app;
