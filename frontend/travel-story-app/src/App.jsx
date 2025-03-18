@@ -1,21 +1,9 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
-import Login from './pages/Auth/Login'
-import SignUp from './pages/Auth/SignUp'
-import Home from './pages/Home/Home'
-
-
 
 const App = () => {
   return (
-    <div>
-      <Router>
-        <Routes>
-          <Route path='/dashboard' exact element={<Home/>} />
-          <Route path='/login' exact element={<Login/>} />
-          <Route path='/signup' exact element={<SignUp/>} />
-        </Routes>
-      </Router>
+    <div className="min-h-screen flex items-center justify-center bg-blue-500 text-white text-3xl">
+      Tailwind is working! 🚀
     </div>
   )
 }
