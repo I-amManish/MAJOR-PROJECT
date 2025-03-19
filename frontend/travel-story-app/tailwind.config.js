@@ -1,8 +1,20 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"], // Ensures Tailwind scans all files
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"], 
   theme: {
-    extend: {},
+    fontFamily: {
+      display: ["Poppins", "sans-serif"],
+    },
+    extend: {
+      colors: {
+        primary: "#0586D3",
+        secondary: "#EF863E",
+      },
+      backgroundImage: {
+        'login-bg-img': "url('/src/assets/images/bg-imgage.jpg')",
+        'signup-bg-img': "url('/src/assets/images/bg-signup-image.png')",
+      },
+    },
   },
   plugins: [],
 };
