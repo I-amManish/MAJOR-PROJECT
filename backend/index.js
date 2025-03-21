@@ -15,6 +15,7 @@ const { authenticateToken } = require('./utilities')
 const User = require('./models/user.model');
 const TravelStory = require('./models/travelStory.model');
 const { resolveSoa } = require('dns');
+const { error } = require('console');
 
 
 mongoose.connect(config.connectionString);
@@ -95,7 +96,7 @@ app.post("/login", async (req, res ) => {
 });
 
 // info: Get User
-app.post("/get-user",authenticateToken, async (req, res ) => {
+app.get("/get-user",authenticateToken, async (req, res ) => {
     const { userId } = req.user
     
     const isUser = await User.findOne({_id: userId});
@@ -177,7 +178,7 @@ app.post("/add-travel-story", authenticateToken, async (req, res) => {
         return res.status(400).json({ error: true, message: "All fields are required" });
     }
 
-    // todo: convert visitedDate from milliseconds to Date object
+    // info: convert visitedDate from milliseconds to Date object
     const parsedVisitedDate = new Date(parseInt(visitedDate));
 
     try {
@@ -210,80 +211,91 @@ app.get("/get-all-stories", authenticateToken, async (req, res) => {
 });
 
 // info: Edit story
-app.put("/edit-story/:id", authenticateToken, async (req, res) => {
+app.put('/edit-story/:id', authenticateToken, async (req, res) => { 
     const { id } = req.params;
     const { title, story, visitedLocation, imageUrl, visitedDate } = req.body;
-
     const { userId } = req.user;
+
     // info: Validate required fields
     if (!title || !story || !visitedLocation || !imageUrl || !visitedDate) {
         return res.status(400).json({ error: true, message: "All fields are required" });
     }
 
-    // todo: convert visitedDate from milliseconds to Date object
-    const parsedVisitedDate = new Date(parseInt(visitedDate));
+    // info: Convert visitedDate from milliseconds to Date object
+    const parsedVisitedDate = new Date(Number(visitedDate));
+    if (isNaN(parsedVisitedDate.getTime())) {
+        return res.status(400).json({ error: true, message: "Invalid visitedDate format" });
+    }
 
-    try{
-        // info: find the travel story by ID and ensure it belongs to the authenticated user
-        const travelStory = await travelStory.findOne({_id: id, userId: userId });
+    try {
+        // info: Find the travel story by ID and ensure it belongs to the authenticated user
+        const travelStory = await TravelStory.findOne({ _id: id, userId });
 
-        if(!travelStory) {
-            return  res.status(404).json({ error: true, message: "Travel story not found" });
+        if (!travelStory) {
+            return res.status(404)
+            .json({ error: true, message: "Travel story not found" });
         }
-        
-        const placeholderImgUrl = `http://localhost:3000/assets/placeholder.jpg`;
+
+        const placeholderImgUrl = 'http://localhost:3000/assets/placeholder.jpg';
 
         travelStory.title = title;
         travelStory.story = story;
         travelStory.visitedLocation = visitedLocation;
         travelStory.imageUrl = imageUrl || placeholderImgUrl;
         travelStory.visitedDate = parsedVisitedDate;
-        
+
         await travelStory.save();
-        res.status(200).json({ story: travelStory, message: "Update Successfully" });
-    } catch (error) {
-        res.status(500).json({ error: true, message: error.message });
-    }
-})
+        res.status(200).json({ story: travelStory, message: 'Update Successful' });
 
-
-// info: delete a travel story
-app.delete("/delete-story/:id", authenticateToken, async (req, res) => {
-    const { id } = req.params;
-    const { userId } = req.user;
-
-    try{
-        // info: find the travel story by ID and ensure it belongs to the authenticated user
-        const travelStory = await travelStory.findOne({_id: id, userId: userId });
-
-        if(!travelStory) {
-            return  res.status(404).json({ error: true, message: "Travel story not found" });
-        }
-
-        // info: delete the travel story from the database
-        await travelStory.deleteOne({ _id: id, userId: userId });
-
-        // info: extract the filename from the imageUrl
-        const imageUrl = travelStory.imageUrl;
-        const filename = path.basename(imageUrl);
-        
-        // info: define the file path
-        const filePath = path.join(__dirname, 'uploads', filename);
-
-        // info: delete the image file from the uploads folder
-
-        fs.unlink(filePath, (err) =>{
-            if(err){
-                console.error("Failed to delete the image file:", err);
-                // note: Optionally, you could still respond with success status here
-                // note: if you don't want to treat this as a critical error
-            }
-        });
-        res.status(200).json({ message: "Travel Story deleted successfully" });
     } catch (error) {
         res.status(500).json({ error: true, message: error.message });
     }
 });
+
+
+// info: delete a travel story
+app.delete('/delete-story/:id', authenticateToken, async (req, res) => {
+    const { id } = req.params;
+    const { userId } = req.user;
+
+    try {
+        // info: Find the travel story by ID and ensure it belongs to the authenticated user
+        const travelStory = await TravelStory.findOne({ _id: id, userId });
+
+        if (!travelStory) {
+            return res.status(404).json({ error: true, message: "Travel story not found" });
+        }
+
+        // info: Delete the travel story from the database
+        await travelStory.deleteOne();
+
+        // info: Extract the filename from the imageUrl
+        const imageUrl = travelStory.imageUrl;
+        const filename = path.basename(imageUrl); // Extract filename from URL
+
+        // info: Construct full file path
+        const filePath = path.join(__dirname, 'uploads', filename); // Adjust the folder path as needed
+
+        // info: Check if file exists before deleting
+        if (fs.existsSync(filePath)) {
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error("Failed to delete image file:", err);
+                } else {
+                    console.log("Image file deleted successfully:", filename);
+                }
+            });
+        } else {
+            console.warn("Image file not found:", filename);
+        }
+
+        res.status(200).json({ message: "Travel story deleted successfully" });
+
+    } catch (error) {
+        res.status(500).json({ error: true, message: error.message });
+    }
+});
+
 
 // info: Update isFavourite
 app.put("/update-is-favourite/:id", authenticateToken, async (req, res) => {
@@ -300,60 +312,100 @@ app.put("/update-is-favourite/:id", authenticateToken, async (req, res) => {
 
         travelStory.isFavourite = isFavourite;
         await travelStory.save();
-        res.status(200).join({ story:travelStory, message:'Update Successful' });
+        res.status(200).json({ story:travelStory, message:'Update Successful' });
     } catch (error) {
         res.status(500).json({ error: true, message: error.message });
     }
 });
 
-
-// info: search travel stories
-app.get("/search", authenticateToken, async (req, res) => {
-    const { query } = req.query;
+// info: search
+app.get('/search', authenticateToken, async (req, res) => {
+    let { query } = req.query;
     const { userId } = req.user;
-    if (!query) {
-        return res.status(404).json({ error: true, message: "Query is required" });
+
+    console.log("Received Query:", query); // Debugging
+    console.log("User ID:", userId); // Debugging
+
+    // ✅ Input validation
+    if (!query || typeof query !== 'string' || query.trim() === "") {
+        console.log("Empty query detected, returning empty array"); // Debugging
+        return res.status(200).json({ 
+            error: false, 
+            message: "Query is empty", 
+            stories: [] 
+        });
     }
 
-    try{
-        const searchResults = await TravelStory.find({
+    query = query.trim(); // Ensure query has no extra spaces
+    console.log("Trimmed Query:", query); // Debugging
+
+    try {
+        const searchQuery = {
             userId: userId,
             $or: [
-                {title: { $regex: query, $options:"i" }},
-                { story: {$regex: query, $options:"i" } },
-                {visitedLocation: { $regex:query, $options:"i"}},
+                { title: { $regex: query, $options: "i" } },
+                { story: { $regex: query, $options: "i" } },
+                { visitedLocation: { $regex: query, $options: "i" } }
             ],
-        }).sort({ isFavourite: -1 });
-        
-        res.status(200).json({stories: searchResults});
+        };
+
+        console.log("MongoDB Query:", searchQuery); // Debugging
+
+        const searchResults = await TravelStory.find(searchQuery).sort({ isFavourite: -1 });
+
+        console.log("Search Results:", searchResults); // Debugging
+
+        // ✅ Handle no results
+        if (searchResults.length === 0) {
+            return res.status(200).json({ 
+                error: false, 
+                message: "No stories found", 
+                stories: [] 
+            });
+        }
+
+        // ✅ Success response
+        res.status(200).json({ 
+            error: false, 
+            message: "Stories retrieved successfully", 
+            stories: searchResults 
+        });
     } catch (error) {
+        console.error("Search Error:", error); // Log the error for debugging
+        res.status(500).json({ 
+            error: true, 
+            message: "Internal server error" 
+        });
+    }
+});
+
+// info: filter travel stories by date range
+app.get('/travel-stories/filter', authenticateToken, async (req, res) => {
+    const { startDate, endDate } = req.query;
+    const { userId } = req.user;
+
+    try {
+        // ✅ Convert milliseconds to Date objects
+        const start = new Date(parseInt(startDate));
+        const end = new Date(parseInt(endDate));
+
+        console.log("Filtering stories from:", start, "to", end); // Debugging
+
+        // ✅ Find travel stories within date range
+        const filteredStories = await TravelStory.find({
+            userId: userId,
+            visitedDate: { $gte: start, $lte: end },
+        }).sort({ isFavourite: -1 });
+
+        console.log("Filtered Stories:", filteredStories); // Debugging
+
+        res.status(200).json({ stories: filteredStories });
+    } catch (error) {
+        console.error("🔥 Error:", error);
         res.status(500).json({ error: true, message: error.message });
     }
 });
 
-
-// info: filter travel stories by date range
-app.get("/travel-stories/filter", authenticateToken, async (req,res) => {
-    const { startDate, endDate } = req.query;
-    const { userId } = req.body;
-
-    try{
-        // note: convert startDate and endDate from milliseconds to Date objects
-        const start = new Date (parseInt(startDate));
-        const end = new Date (parseInt(endDate));
-
-        // note: find travel stories that belong to the authenticated user and fall within the date range
-        const filteredStories = await TravelStory.find({
-            userId: userId,
-            visitedDate: { $gte:start, $lte: end },
-        }).sort({ isFavourite: -1 });
-        
-        res.status(200).json({ stories: filteredStories});
-
-    } catch (error) {
-        res.status(500).json({ error: true, message: error.message });
-    }
-})
 
 
 
