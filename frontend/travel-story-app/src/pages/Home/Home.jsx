@@ -120,27 +120,7 @@ const Home = () => {
 
         {/* Add and Edit travel story model */}
 
-        <Modal
-            isOpen={openAddEditModal.isShown}
-            onRequestClose={() => {}}
-            style={{
-                overlay:{
-                    backgroundColor: 'rgba(0,0,0.0.2)',
-                    zIndex: 999,
-                },
-            }}
-            appElement={document.getElementById('root')}
-            className='model-box'
-        >
-            <AddEditTravelStory
-                type={openAddEditModal.type}
-                storyInfo={openAddEditModal.data}
-                onClose={() => {
-                    setOpenAddEditModal({ isShown: false, type:'add', data: null });
-                }}
-                getAllTravelStories = {getAllTravelStories}
-            />
-        </Modal>
+
 
 
         <button
