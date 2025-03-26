@@ -118,7 +118,8 @@ const Home = () => {
         </div>
 
 
-        {/* Add and Edit travel story model */}
+        {/* note: Add and Edit travel story model */}
+
 
 
 
