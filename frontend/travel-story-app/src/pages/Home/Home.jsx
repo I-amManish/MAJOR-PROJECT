@@ -6,6 +6,7 @@ import { MdAdd} from 'react-icons/md';
 import Modal from 'react-modal';
 import AddEditTravelStory from './AddEditTravelStory';
 
+
 import TravelStoryCard from '../../components/Cards/TravelStoryCard';
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -120,6 +121,27 @@ const Home = () => {
 
         {/* note: Add and Edit travel story model */}
 
+            <Modal
+                isOpen={openAddEditModal.isShown}
+                onRequestClose={() =>{}}
+                style={{
+                    overlay:{
+                        backgroundColor:'rgba(0,0,0,0.2)',
+                        zIndex:999,
+                    },
+                }}
+                appElement={document.getElementById('root')}
+                className='model-box'
+                >
+                    <AddEditTravelStory
+                        type={openAddEditModal.type}    
+                        storyInfo={openAddEditModal.data}
+                        onClose={() => {
+                            setOpenAddEditModal({ isShown: false, type:'add', data: null});
+                        }}
+                        getAllTravelStories={getAllTravelStories}
+                    />
+                </Modal>
 
 
 
@@ -135,7 +157,7 @@ const Home = () => {
         <ToastContainer  />
     </>
 
-  )
-}
+  );
+};
 
 export default Home

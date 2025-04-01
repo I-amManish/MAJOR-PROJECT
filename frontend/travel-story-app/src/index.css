@@ -4,7 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.rdp-root{
+    --rdp-accent-color: #01B0CB !important;/* info: change the accent color color to indigo */
+    --rdp-accent-background-color: #DFFBFF !important; /* info: change the accent background color */
+    --rdp-day_button-button-border-radius: 8px !important;
+    --rdp-selected-font: bold medium var(--rdp-font-family) !important;
+}
+
 @layer base{
+    
     html{
         font-family: "Poppins", "sans-serif";
     }
@@ -55,4 +63,18 @@
     .icon-btn{
         @apply text-[22px] text-slate-300 cursor-pointer hover:text-red-500;
     }
+    
+    .btn-small{
+        @apply flex items-center gap-1 text-xs font-medium bg-cyan-50 text-primary shadow-cyan-100/0 border  border-cyan-100 hover:bg-primary hover:text-white rounded px-3 py-[3px];
+    }
+    
+    .input-label{
+        @apply text-xs text-slate-400;
+    }
+
+    .btn-delete{
+        @apply bg-rose-50 text-rose-500 shadow-rose-100/0 border border-rose-100 hover:bg-rose-500 hover:text-white;
+    }
+
+
 }
