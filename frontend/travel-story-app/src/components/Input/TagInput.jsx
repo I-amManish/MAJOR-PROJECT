@@ -1,6 +1,6 @@
 import React from 'react'
 
-const TagInput = () => {
+const TagInput = ({ tags, setTags}) => {
   return (
     <div>TagInput</div>
   )
