@@ -76,7 +76,7 @@ const ImageSelector = ({ image, setImage, handleDeleteImg }) => {
               <MdDeleteOutline className='text-lg' />
             </button>
         </div>
-      )};
+      )}
         
     </div>
   )
