@@ -27,7 +27,7 @@ const AddEditTravelStory = ({ storyInfo, type, onClose, getAllTravelStories }) =
             if (storyImg) {
                 const imageUploadRes = await uploadImage(storyImg);
                 // note: Get image URL
-                imageURL = imageUploadRes.imageURL || "";
+                imageUrl = imageUploadRes.imageURL || "";
             }
 
             const response = await axiosInstance.post('/add-travel-story', {
