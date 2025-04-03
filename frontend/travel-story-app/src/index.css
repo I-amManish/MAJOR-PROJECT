@@ -5,10 +5,10 @@
 @tailwind utilities;
 
 .rdp-root{
-    --rdp-accent-color: #01B0CB !important;/* info: change the accent color color to indigo */
-    --rdp-accent-background-color: #DFFBFF !important; /* info: change the accent background color */
-    --rdp-day_button-button-border-radius: 8px !important;
-    --rdp-selected-font: bold medium var(--rdp-font-family) !important;
+    --rdp-accent-color: #01b0cb;
+    --rdp-accent-background-color: #dffbff;
+    --rdp-day_button-border-radius: 8px;
+    --rdp-selected-font:bold medium var(--rdp-font-family);
 }
 
 @layer base{
