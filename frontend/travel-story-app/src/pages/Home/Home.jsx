@@ -10,10 +10,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import AddEditTravelStory from './AddEditTravelStory';
 import ViewTravelStory from './ViewTravelStory';
 import EmptyCard from '../../components/Cards/EmptyCard';
-import EmptyImg from '../../assets/images/EmptyImage.jpg';
+// import EmptyImg from '../../assets/images/EmptyImage.jpg';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import moment from 'moment';
+import { setDate } from 'date-fns';
+import FilterInfoTitle from '../../components/Cards/FilterInfoTitle';
+import { getEmptyCardMessage, getEmptyCardImg } from '../../utils/helper';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -78,6 +81,15 @@ const Home = () => {
 
       if (response.data && response.data.story) {
         toast.success('Story Updated Successfully');
+
+        if(filterType === "search" && searchQuery) {
+          onSearchStory(searchQuery);
+        } else if (filterType === "date") {
+          filterStoriesByDate(dateRange);
+        } else {
+          getAllTravelStories();
+        }
+
         getAllTravelStories();
       }
     } catch (error) {
@@ -158,6 +170,12 @@ const Home = () => {
     filterStoriesByDate(day);
   };
 
+  const resetFilter = () => {
+    setDateRange ({ from: null, to: null });
+    setFilterType("");
+    getAllTravelStories();
+  };
+
   useEffect(() => {
     getUserInfo();
     getAllTravelStories();
@@ -174,6 +192,15 @@ const Home = () => {
       />
 
       <div className="container mx-auto py-10">
+
+      <FilterInfoTitle 
+        filterType={filterType}
+        filterDates={dateRange}
+        onClear={() => {
+          resetFilter();
+        }}
+      />
+
         <div className="flex gap-7">
           <div className="flex-1">
             {loading ? (
@@ -197,8 +224,9 @@ const Home = () => {
               </div>
             ) : (
               <EmptyCard
-                imgSrc={EmptyImg}
-                message={`Start creating your first Story! Click the 'Add' button to jot down your thoughts, ideas, and memories. Let's get started!`}
+                imgSrc={getEmptyCardImg(filterType)}
+                message={getEmptyCardMessage(filterType)}
+                // message={`Start creating your first Story! Click the 'Add' button to jot down your thoughts, ideas, and memories. Let's get started!`}
               />
             )}
           </div>
