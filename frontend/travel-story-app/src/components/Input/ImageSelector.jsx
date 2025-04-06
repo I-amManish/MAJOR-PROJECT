@@ -79,7 +79,7 @@ const ImageSelector = ({ image, setImage, handleDeleteImg }) => {
       )}
         
     </div>
-  )
-}
+  );
+};
 
 export default ImageSelector

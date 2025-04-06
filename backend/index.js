@@ -123,7 +123,7 @@ app.post("/image-upload", upload.single("image"), async (req, res) => {
         }
 
         const imageUrl = `http://localhost:3000/uploads/${req.file.filename}`;
-        res.status(201).json({ imageUrl });
+        res.status(200).json({ imageUrl });
 
     } catch (error) {
         res.status(500).json({
